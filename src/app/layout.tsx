@@ -6,7 +6,7 @@ import './globals.css'
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'CourtCash | Basketball Manager',
+  title: 'Basketball Payment Manager',
   description: 'Premium basketball team and finance manager',
 }
 
@@ -21,8 +21,8 @@ export default function RootLayout({
         <div className="layout-container">
           <aside className="sidebar">
             <div style={{ marginBottom: '2.5rem' }}>
-              <h2 className="title-gradient" style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.8rem' }}>🏀</span> CourtCash
+              <h2 className="title-gradient" style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', lineHeight: '1.3' }}>
+                <span style={{ fontSize: '1.5rem' }}>🏀</span> Basketball Payment Manager
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.2rem' }}>Team MVP Manager</p>
             </div>
