@@ -32,6 +32,10 @@ export default function RootLayout({
                 <LayoutDashboard size={20} />
                 Dashboard
               </Link>
+              <Link href="/games" className="nav-link" style={{ color: 'var(--accent-primary)' }}>
+                <Swords size={20} />
+                Log a Game
+              </Link>
               <Link href="/opponents" className="nav-link">
                 <Swords size={20} />
                 Opponents

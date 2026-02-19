@@ -1,5 +1,6 @@
-import { getGames } from '@/actions/games'
+import { getGames, deleteGame } from '@/actions/games'
 import { format } from 'date-fns'
+import { Trash2 } from 'lucide-react'
 
 export default async function OpponentsPage() {
     const games = await getGames()
@@ -34,7 +35,19 @@ export default async function OpponentsPage() {
                                 {gamesList.map((game: any) => (
                                     <div key={game.id} style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--panel-border)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-                                            <span style={{ fontWeight: 600 }}>{format(new Date(game.date), 'MMMM d, yyyy')}</span>
+                                            <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {format(new Date(game.date), 'MMMM d, yyyy')}
+                                                <form action={async () => {
+                                                    'use server'
+                                                    await deleteGame(game.id)
+                                                }}>
+                                                    <button type="submit" style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }} onClick={(e) => {
+                                                        if (!confirm('Are you sure you want to delete this game?')) e.preventDefault()
+                                                    }}>
+                                                        <Trash2 size={16} className="hover:text-[var(--accent-danger)] transition-colors" />
+                                                    </button>
+                                                </form>
+                                            </span>
                                             <span style={{
                                                 fontWeight: 700,
                                                 color: game.result === 'W' ? 'var(--accent-success)' : game.result === 'L' ? 'var(--accent-danger)' : 'var(--accent-warning)',
