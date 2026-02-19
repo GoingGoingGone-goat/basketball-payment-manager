@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Player {
+  id        String     @id @default(uuid())
+  name      String
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  GameStats GameStat[]
+  Fees      Fee[]
+  Payments  Payment[]
+}
+
+model Game {
+  id            String     @id @default(uuid())
+  opponent      String
+  date          DateTime
+  teamScore     Int
+  opponentScore Int
+  result        String     // e.g., "W", "L", "D"
+  season        String
+  createdAt     DateTime   @default(now())
+
+  GameStats     GameStat[]
+}
+
+model GameStat {
+  id       String @id @default(uuid())
+  gameId   String
+  playerId String
+  points   Int
+
+  Game     Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  Player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
+model Fee {
+  id          String   @id @default(uuid())
+  playerId    String
+  amount      Float
+  season      String
+  description String
+  createdAt   DateTime @default(now())
+
+  Player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  playerId  String
+  amount    Float
+  date      DateTime @default(now())
+
+  Player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
