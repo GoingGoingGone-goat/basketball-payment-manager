@@ -48,7 +48,6 @@ export default async function PlayersPage() {
                                     {player.positions && <span style={{ background: 'rgba(59, 130, 246, 0.2)', color: 'var(--accent-primary)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>{player.positions}</span>}
                                     {player.height && <span>{player.height}</span>}
                                     {player.weight && <span>• {player.weight}</span>}
-                                    {!player.positions && !player.height && !player.weight && <span>Profile Setup Needed</span>}
                                 </div>
                             </div>
                         </div>

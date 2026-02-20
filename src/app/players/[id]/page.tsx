@@ -104,11 +104,21 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Offensive Rating</span>
-                            <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>{careerStats.oRtg} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>TEAM PPG</span></span>
+                            <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                                {careerStats.oRtg} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {player.teamAverages.oRtg} Team</span>
+                            </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Defensive Rating</span>
-                            <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>{careerStats.dRtg} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>OPP PPG</span></span>
+                            <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                                {careerStats.dRtg} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {player.teamAverages.dRtg} Team</span>
+                            </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Net Rating</span>
+                            <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                                {Number(careerStats.netRtg) > 0 ? '+' : ''}{careerStats.netRtg} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {Number(player.teamAverages.netRtg) > 0 ? '+' : ''}{player.teamAverages.netRtg} Team</span>
+                            </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Total Career Points</span>

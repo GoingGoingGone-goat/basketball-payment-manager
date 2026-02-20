@@ -107,6 +107,20 @@ export async function getPlayerDetail(id: string) {
         }
     }
 
+    const allGames = await db.game.findMany();
+    const totalTeamGames = allGames.length;
+    let totalGlobalTeamPoints = 0;
+    let totalGlobalOpponentPoints = 0;
+
+    allGames.forEach((g: any) => {
+        totalGlobalTeamPoints += g.teamScore;
+        totalGlobalOpponentPoints += g.opponentScore;
+    });
+
+    const teamAvgORtg = totalTeamGames > 0 ? (totalGlobalTeamPoints / totalTeamGames).toFixed(1) : '0.0';
+    const teamAvgDRtg = totalTeamGames > 0 ? (totalGlobalOpponentPoints / totalTeamGames).toFixed(1) : '0.0';
+    const teamAvgNetRtg = totalTeamGames > 0 ? ((totalGlobalTeamPoints / totalTeamGames) - (totalGlobalOpponentPoints / totalTeamGames)).toFixed(1) : '0.0';
+
     return {
         ...player,
         careerStats: {
@@ -121,6 +135,11 @@ export async function getPlayerDetail(id: string) {
             dRtg,
             netRtg,
             totalPoints
+        },
+        teamAverages: {
+            oRtg: teamAvgORtg,
+            dRtg: teamAvgDRtg,
+            netRtg: teamAvgNetRtg
         },
         recentGames: player.GameStats.slice(0, 10).map((stat: any) => ({
             id: stat.Game.id,
