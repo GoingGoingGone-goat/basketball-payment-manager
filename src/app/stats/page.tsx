@@ -1,6 +1,7 @@
 import { getGames } from '@/actions/games'
 import { getActivePlayers } from '@/actions/players'
 import { SeasonFilter } from './SeasonFilter'
+import Link from 'next/link'
 
 export default async function StatsPage({ searchParams }: { searchParams: any }) {
     const sp = await searchParams;
@@ -78,7 +79,11 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
                         ) : null}
                         {playerStats.map((stat: any) => (
                             <tr key={stat.player.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }} className="hover:bg-[rgba(255,255,255,0.02)]">
-                                <td style={{ padding: '1rem', fontWeight: 600 }}>{stat.player.name}</td>
+                                <td style={{ padding: '1rem', fontWeight: 600 }}>
+                                    <Link href={`/players/${stat.player.id}`} style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '4px', textDecorationColor: 'rgba(255,255,255,0.2)' }}>
+                                        {stat.player.name}
+                                    </Link>
+                                </td>
                                 <td style={{ padding: '1rem' }}>{stat.gamesPlayed}</td>
                                 <td style={{ padding: '1rem' }}>{stat.totalPoints}</td>
                                 <td style={{ padding: '1rem', color: 'var(--accent-primary)', fontWeight: 700 }}>

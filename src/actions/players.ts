@@ -93,11 +93,27 @@ export async function getPlayerDetail(id: string) {
     const dRtg = gp > 0 ? (totalOpponentPoints / gp).toFixed(1) : '0.0';
     const netRtg = gp > 0 ? ((totalTeamPoints / gp) - (totalOpponentPoints / gp)).toFixed(1) : '0.0';
 
+    // New Advanced Scoring Metrics
+    const pointsArray = player.GameStats.map((s: any) => s.points).sort((a: number, b: number) => a - b);
+    const highestScoringGame = pointsArray.length > 0 ? pointsArray[pointsArray.length - 1] : 0;
+
+    let medianPpg = 0;
+    if (pointsArray.length > 0) {
+        const mid = Math.floor(pointsArray.length / 2);
+        if (pointsArray.length % 2 === 0) {
+            medianPpg = (pointsArray[mid - 1] + pointsArray[mid]) / 2;
+        } else {
+            medianPpg = pointsArray[mid];
+        }
+    }
+
     return {
         ...player,
         careerStats: {
             gp,
             ppg,
+            medianPpg,
+            highestScoringGame,
             onesPct,
             twosPct,
             threesPct,
