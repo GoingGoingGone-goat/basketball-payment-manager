@@ -92,6 +92,19 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                                 <div style={{ height: '100%', width: `${careerStats.threesPct}%`, background: 'var(--accent-primary)' }} />
                             </div>
                         </div>
+
+                        {/* Consistency Metric Box */}
+                        <div style={{ marginTop: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Scoring Consistency</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Index (1.00 = perfect)</span>
+                                </div>
+                                <span style={{ fontWeight: 800, fontSize: '1.2rem', color: Number(careerStats.consistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(careerStats.consistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)' }}>
+                                    {careerStats.consistencyIndex}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
