@@ -10,6 +10,7 @@ export function ClientStatsTable({ playerStats }: { playerStats: any[] }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid var(--panel-border)', userSelect: 'none' }}>
+                    <input type="checkbox" checked={showAdvanced} onChange={(e) => setShowAdvanced(e.target.checked)} style={{ display: 'none' }} />
                     <span style={{ fontSize: '0.9rem', color: showAdvanced ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600 }}>Advanced Stats</span>
                     <div style={{
                         position: 'relative', width: '40px', height: '22px', background: showAdvanced ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)', borderRadius: '11px', transition: 'background 0.3s'
