@@ -80,3 +80,26 @@ export async function getFinancesTotals() {
     const totalDebt = players.reduce((sum: number, p: any) => sum + (p.debt > 0 ? p.debt : 0), 0)
     return { totalDebt }
 }
+
+export async function getTransactionHistory() {
+    const fees = await db.fee.findMany({ include: { Player: true } })
+    const payments = await db.payment.findMany({ include: { Player: true } })
+
+    // Combine and sort by date descending
+    const transactions = [
+        ...fees.map((f: any) => ({ ...f, type: 'FEE', date: f.createdAt })),
+        ...payments.map((p: any) => ({ ...p, type: 'PAYMENT' }))
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+    return transactions
+}
+
+export async function deleteTransaction(id: string, type: 'FEE' | 'PAYMENT') {
+    if (type === 'FEE') {
+        await db.fee.delete({ where: { id } })
+    } else {
+        await db.payment.delete({ where: { id } })
+    }
+    revalidatePath('/')
+    revalidatePath('/finances')
+}
