@@ -34,10 +34,7 @@ export default async function PlayersPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
                 {activePlayers.map((player: any) => (
                     <Link href={`/players/${player.id}`} key={player.id} style={{ textDecoration: 'none' }}>
-                        <div className="glass-card layout-container" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', transition: 'transform 0.2s, background 0.2s', cursor: 'pointer' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
-                        >
+                        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer' }}>
                             <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(0,0,0,0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid var(--panel-border)' }}>
                                 {player.photoUrl ? (
                                     <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -69,10 +66,7 @@ export default async function PlayersPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                         {inactivePlayers.map((player: any) => (
                             <Link href={`/players/${player.id}`} key={player.id} style={{ textDecoration: 'none', opacity: 0.7 }}>
-                                <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', transition: 'transform 0.2s', cursor: 'pointer' }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'none' }}
-                                >
+                                <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer' }}>
                                     <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(0,0,0,0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                         {player.photoUrl ? (
                                             <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)' }} />
