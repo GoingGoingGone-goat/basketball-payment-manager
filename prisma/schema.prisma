@@ -8,10 +8,11 @@ datasource db {
 }
 
 model Player {
-  id        String     @id @default(uuid())
-  name      String
-  active    Boolean    @default(true)
-  createdAt DateTime   @default(now())
+  id           String     @id @default(uuid())
+  name         String
+  jerseyNumber Int?       // Added from PlayHQ
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
 
   GameStats GameStat[]
   Fees      Fee[]
@@ -36,6 +37,10 @@ model GameStat {
   gameId   String
   playerId String
   points   Int
+  ones     Int    @default(0) // Free throws
+  twos     Int    @default(0) // 2-point FGs
+  threes   Int    @default(0) // 3-point FGs
+  fouls    Int    @default(0) // Personal fouls
 
   Game     Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
   Player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)

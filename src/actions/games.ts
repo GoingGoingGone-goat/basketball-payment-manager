@@ -10,7 +10,7 @@ export async function logGame(data: {
     opponentScore: number
     result: string
     season: string
-    playerStats: { playerId: string; points: number }[]
+    playerStats: { playerId: string; points: number; ones: number; twos: number; threes: number; fouls: number }[]
 }) {
     const game = await db.game.create({
         data: {
@@ -24,6 +24,10 @@ export async function logGame(data: {
                 create: data.playerStats.map(stat => ({
                     playerId: stat.playerId,
                     points: stat.points,
+                    ones: stat.ones,
+                    twos: stat.twos,
+                    threes: stat.threes,
+                    fouls: stat.fouls
                 }))
             }
         }

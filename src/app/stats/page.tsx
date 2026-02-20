@@ -11,10 +11,16 @@ export default async function StatsPage() {
 
         let totalPoints = 0
         let wins = 0
+        let totalThrees = 0
+        let totalFouls = 0
 
         playerGames.forEach((g: any) => {
             const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
-            if (pStat) totalPoints += pStat.points
+            if (pStat) {
+                totalPoints += pStat.points
+                totalThrees += pStat.threes
+                totalFouls += pStat.fouls
+            }
             if (g.result === 'W') wins++
         })
 
@@ -23,6 +29,8 @@ export default async function StatsPage() {
             gamesPlayed: totalGames,
             reliability: games.length > 0 ? (totalGames / games.length) * 100 : 0,
             totalPoints,
+            totalThrees,
+            totalFouls,
             ppg: totalGames > 0 ? totalPoints / totalGames : 0,
             winPct: totalGames > 0 ? (wins / totalGames) * 100 : 0
         }
@@ -40,6 +48,8 @@ export default async function StatsPage() {
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>GP</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Total Pts</th>
                             <th style={{ padding: '1rem', color: 'var(--accent-primary)' }}>PPG</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>3PTM</th>
+                            <th style={{ padding: '1rem', color: 'var(--accent-danger)' }}>Fouls/G</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Win %</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Reliability</th>
                         </tr>
@@ -55,6 +65,10 @@ export default async function StatsPage() {
                                 <td style={{ padding: '1rem' }}>{stat.totalPoints}</td>
                                 <td style={{ padding: '1rem', color: 'var(--accent-primary)', fontWeight: 700 }}>
                                     {stat.ppg.toFixed(1)}
+                                </td>
+                                <td style={{ padding: '1rem' }}>{stat.totalThrees}</td>
+                                <td style={{ padding: '1rem', color: 'var(--accent-danger)' }}>
+                                    {stat.gamesPlayed > 0 ? (stat.totalFouls / stat.gamesPlayed).toFixed(1) : '0.0'}
                                 </td>
                                 <td style={{ padding: '1rem', color: stat.winPct > 50 ? 'var(--accent-success)' : stat.winPct < 40 ? 'var(--accent-danger)' : 'inherit' }}>
                                     {stat.winPct.toFixed(1)}%

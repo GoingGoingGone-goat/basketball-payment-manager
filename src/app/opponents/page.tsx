@@ -62,7 +62,7 @@ export default async function OpponentsPage() {
                                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                                             <strong style={{ color: 'var(--text-primary)' }}>Roster & Scoring: </strong>
                                             {game.GameStats.length > 0
-                                                ? game.GameStats.map((stat: any) => `${stat.Player.name} (${stat.points}pts)`).join(' • ')
+                                                ? game.GameStats.map((stat: any) => `${stat.Player.name} (${stat.points}p, ${stat.threes}x3pt, ${stat.fouls}f)`).join(' • ')
                                                 : 'No players logged'}
                                         </div>
                                     </div>
