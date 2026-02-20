@@ -229,7 +229,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         <span style={{ color: 'var(--accent-primary)' }}>⚡</span> Power Rankings <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400 }}>(Individual Impact)</span>
                     </h2>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '1.5rem' }}>
 
                         {/* Efficiency */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -242,7 +242,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.efficiency.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.efficiency.map((p, idx) => (
+                                {stats.efficiency.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -265,7 +265,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.reliability.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No attendance records found.</div>}
-                                {stats.reliability.map((p, idx) => (
+                                {stats.reliability.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -288,7 +288,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.luckyCharm.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.luckyCharm.map((p, idx) => (
+                                {stats.luckyCharm.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -303,7 +303,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
 
                     {/* --- INDIVIDUAL STATS (ROW 2 - Scoring Breakdown) --- */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '1.5rem' }}>
 
                         {/* 1-Pointers */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -316,7 +316,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.onesBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.onesBoard.map((p, idx) => (
+                                {stats.onesBoard.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -339,7 +339,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.twosBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.twosBoard.map((p, idx) => (
+                                {stats.twosBoard.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -362,7 +362,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.threesBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.threesBoard.map((p, idx) => (
+                                {stats.threesBoard.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -377,7 +377,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
 
                     {/* --- INDIVIDUAL STATS (ROW 3 - Advanced Team Ratings) --- */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '3rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '3rem' }}>
 
                         {/* The Spearhead */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -390,7 +390,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.spearhead.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.spearhead.map((p, idx) => (
+                                {stats.spearhead.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -413,7 +413,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.wall.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.wall.map((p, idx) => (
+                                {stats.wall.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -436,7 +436,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </p>
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.differenceMaker.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.differenceMaker.map((p, idx) => (
+                                {stats.differenceMaker.slice(0, 5).map((p, idx) => (
                                     <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
@@ -485,7 +485,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '3rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '3rem' }}>
 
                         {/* The Core */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -499,7 +499,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.synergyCore.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No groups meet the requirement.</div>}
-                                {stats.synergyCore.map((g, idx) => (
+                                {stats.synergyCore.slice(0, 5).map((g, idx) => (
                                     <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700, marginTop: '2px' }}>{idx + 1}</span>
@@ -523,7 +523,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.synergyWinners.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No groups meet the requirement.</div>}
-                                {stats.synergyWinners.map((g, idx) => (
+                                {stats.synergyWinners.slice(0, 5).map((g, idx) => (
                                     <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700, marginTop: '2px' }}>{idx + 1}</span>
@@ -547,7 +547,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                 {stats.synergyWall.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No groups meet the requirement.</div>}
-                                {stats.synergyWall.map((g, idx) => (
+                                {stats.synergyWall.slice(0, 5).map((g, idx) => (
                                     <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.8rem' }}>
                                             <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700, marginTop: '2px' }}>{idx + 1}</span>
