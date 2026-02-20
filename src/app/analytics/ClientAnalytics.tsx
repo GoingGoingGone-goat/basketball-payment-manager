@@ -48,35 +48,6 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const activePlayerIds = new Set<string>()
         const activePlayersList = players.filter((p: any) => activePlayerIds.has(p.id))
 
-        let globalConsistencyIndex = '0.00'
-        let globalConsistencyRate = '0.0'
-        let globalMad = '0.0'
-
-        if (totalGamesPlayed > 0) {
-            let sumSquaredDiffs = 0;
-            let sumAbsoluteDiffs = 0;
-            let gamesInBand = 0;
-            const bandWidth = 5;
-
-            filteredGames.forEach((g: any) => {
-                const pt = g.teamScore
-                sumSquaredDiffs += Math.pow(pt - oRtg, 2)
-                sumAbsoluteDiffs += Math.abs(pt - oRtg)
-
-                if (pt >= (oRtg - bandWidth) && pt <= (oRtg + bandWidth)) {
-                    gamesInBand++
-                }
-            })
-
-            const sd = Math.sqrt(sumSquaredDiffs / totalGamesPlayed)
-            if (oRtg > 0) {
-                const cv = sd / oRtg
-                globalConsistencyIndex = (1 - cv).toFixed(2)
-            }
-            globalConsistencyRate = ((gamesInBand / totalGamesPlayed) * 100).toFixed(1)
-            globalMad = (sumAbsoluteDiffs / totalGamesPlayed).toFixed(1)
-        }
-
         // --- POWER RANKINGS (INDIVIDUAL) ---
         const individualStats = activePlayersList.map((player: any) => {
             const playerGames = filteredGames.filter((g: any) => g.GameStats.some((s: any) => s.playerId === player.id));
@@ -125,6 +96,45 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
             const wins = playerGames.filter((g: any) => g.result === 'W')
             const luckyCharm = (wins.length / gp) * 100
 
+            // New Consistency Stats Logic
+            const pointsArray: number[] = []
+            playerGames.forEach((g: any) => {
+                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
+                if (pStat) {
+                    pointsArray.push(pStat.points)
+                }
+            })
+
+            let consistencyIndex = 0
+            let consistencyRate = 0
+            let mad = 0
+
+            if (gp > 0) {
+                const meanPoints = ptsScored / gp;
+                let sumSquaredDiffs = 0;
+                let sumAbsoluteDiffs = 0;
+                let gamesInBand = 0;
+                const bandWidth = 5;
+
+                pointsArray.forEach((p: number) => {
+                    sumSquaredDiffs += Math.pow(p - meanPoints, 2);
+                    sumAbsoluteDiffs += Math.abs(p - meanPoints);
+
+                    if (p >= (meanPoints - bandWidth) && p <= (meanPoints + bandWidth)) {
+                        gamesInBand++;
+                    }
+                });
+
+                const sd = Math.sqrt(sumSquaredDiffs / gp);
+                if (meanPoints > 0) {
+                    const cv = sd / meanPoints;
+                    consistencyIndex = 1 - cv;
+                }
+
+                consistencyRate = (gamesInBand / gp) * 100;
+                mad = sumAbsoluteDiffs / gp;
+            }
+
             return {
                 id: player.id,
                 name: player.name,
@@ -137,7 +147,8 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                 efficiency, luckyCharm,
                 onesPerGame: ones / gp,
                 twosPerGame: twos / gp,
-                threesPerGame: threes / gp
+                threesPerGame: threes / gp,
+                consistencyIndex, consistencyRate, mad
             }
         }) as any[]
 
@@ -155,6 +166,12 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const onesBoard = [...eligible].sort((a, b) => b.onesPerGame - a.onesPerGame)
         const twosBoard = [...eligible].sort((a, b) => b.twosPerGame - a.twosPerGame)
         const threesBoard = [...eligible].sort((a, b) => b.threesPerGame - a.threesPerGame)
+
+        // Consistency Boards (filtering out 0 index/0 mad just in case they haven't scored)
+        const validConsistency = eligible.filter(p => p.ptsScored > 0)
+        const consistencyBoard = [...validConsistency].sort((a, b) => b.consistencyIndex - a.consistencyIndex)
+        const bandRateBoard = [...validConsistency].sort((a, b) => b.consistencyRate - a.consistencyRate)
+        const madBoard = [...validConsistency].sort((a, b) => a.mad - b.mad)
 
 
         // --- TEAM SYNERGY (COMBINATIONS) ---
@@ -196,10 +213,10 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
         return {
             totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg,
-            globalConsistencyIndex, globalConsistencyRate, globalMad,
             spearhead, wall, differenceMaker,
             efficiency, reliability, luckyCharm,
             onesBoard, twosBoard, threesBoard,
+            consistencyBoard, bandRateBoard, madBoard,
             synergyCore, synergyWinners, synergyWall
         }
     }, [games, players, minGames, seasonFilter, groupSize])
@@ -249,46 +266,6 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </div>
                         </div>
                     </div>
-
-                    {/* --- EXPANDED CONSISTENCY METRICS ROW --- */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
-                        {/* Consistency Index */}
-                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
-                                <Target size={14} />
-                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Consistency Index</span>
-                            </div>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(1.00 = Perfect)</span>
-                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: Number(stats.globalConsistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(stats.globalConsistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)', marginTop: '0.5rem' }}>
-                                {stats.globalConsistencyIndex}
-                            </span>
-                        </div>
-
-                        {/* Fixed Band Rate */}
-                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
-                                <Activity size={14} />
-                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Fixed Band Rate</span>
-                            </div>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(±5 Pts from Mean)</span>
-                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)', marginTop: '0.5rem' }}>
-                                {stats.globalConsistencyRate}%
-                            </span>
-                        </div>
-
-                        {/* Mean Absolute Deviation */}
-                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
-                                <Activity size={14} />
-                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>MAD</span>
-                            </div>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(Mean Abs. Deviation)</span>
-                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-warning)', marginTop: '0.5rem' }}>
-                                ±{stats.globalMad}
-                            </span>
-                        </div>
-                    </div>
-
 
                     {/* --- INDIVIDUAL STATS (ROW 1) --- */}
                     <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -442,7 +419,81 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     </div>
 
 
-                    {/* --- INDIVIDUAL STATS (ROW 3 - Advanced Team Ratings) --- */}
+                    {/* --- INDIVIDUAL STATS (ROW 3 - Scoring Consistency) --- */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '1.5rem' }}>
+
+                        {/* Consistency Index */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Target size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Consistency Index</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Highest Consistency Index (min {minGames} games). 1.00 is perfect.
+                            </p>
+                            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.consistencyBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.consistencyBoard.slice(0, 7).map((p: any, idx: number) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: p.consistencyIndex >= 0.8 ? 'var(--accent-success)' : p.consistencyIndex >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)' }}>{p.consistencyIndex.toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Fixed Band Rate */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Activity size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Fixed Band Rate</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Highest % of games scoring within ±5 points of own average.
+                            </p>
+                            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.bandRateBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.bandRateBoard.slice(0, 7).map((p: any, idx: number) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.consistencyRate.toFixed(1)}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* MAD */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Activity size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>MAD</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Lowest Mean Absolute Deviation (most predictable average).
+                            </p>
+                            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.madBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.madBoard.slice(0, 7).map((p: any, idx: number) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent-warning)' }}>±{p.mad.toFixed(1)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {/* --- INDIVIDUAL STATS (ROW 4 - Advanced Team Ratings) --- */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: 'auto', marginBottom: '3rem' }}>
 
                         {/* The Spearhead */}
