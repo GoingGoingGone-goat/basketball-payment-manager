@@ -1,7 +1,6 @@
 import { getPlayerDetail, updatePlayerProfile } from '@/actions/players'
 import Link from 'next/link'
 import { ArrowLeft, User, Ruler, Weight, Shield, Coins, Activity, Flame, Target } from 'lucide-react'
-import EditProfileModal from './EditProfileModal'
 
 export default async function PlayerProfilePage({ params }: { params: { id: string } }) {
     const player = await getPlayerDetail(params.id)
@@ -20,55 +19,13 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
             </Link>
 
             {/* --- HERO SECTION --- */}
-            <div className="glass-panel" style={{ padding: '2.5rem', marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: '2.5rem', alignItems: 'center', position: 'relative' }}>
-
-                {/* Photo Column */}
-                <div style={{ width: '140px', height: '140px', borderRadius: '20px', background: 'rgba(0,0,0,0.3)', border: '2px solid var(--panel-border)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {player.photoUrl ? (
-                        <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                        <User size={60} color="var(--text-muted)" />
-                    )}
-                </div>
-
-                {/* Details Column */}
-                <div style={{ flex: 1, minWidth: '250px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <h1 className="title-gradient" style={{ fontSize: '3rem', margin: 0, lineHeight: '1.1' }}>{player.name}</h1>
-                        <EditProfileModal player={{
-                            id: player.id,
-                            name: player.name,
-                            photoUrl: player.photoUrl,
-                            height: player.height,
-                            weight: player.weight,
-                            positions: player.positions
-                        }} />
+            <div className="glass-panel" style={{ padding: '2.5rem', marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', position: 'relative' }}>
+                <h1 className="title-gradient" style={{ fontSize: '3rem', margin: 0, lineHeight: '1.1' }}>{player.name}</h1>
+                {!player.active && (
+                    <div>
+                        <span style={{ padding: '4px 10px', background: 'rgba(239, 68, 68, 0.2)', color: 'var(--accent-danger)', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem' }}>Inactive</span>
                     </div>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '1.5rem' }}>
-                        {player.positions && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                                <Shield size={18} color="var(--accent-primary)" />
-                                <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{player.positions}</span>
-                            </div>
-                        )}
-                        {player.height && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                                <Ruler size={18} color="var(--accent-primary)" />
-                                <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{player.height}</span>
-                            </div>
-                        )}
-                        {player.weight && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                                <Weight size={18} color="var(--accent-primary)" />
-                                <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{player.weight}</span>
-                            </div>
-                        )}
-                        {!player.active && (
-                            <span style={{ padding: '4px 10px', background: 'rgba(239, 68, 68, 0.2)', color: 'var(--accent-danger)', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem' }}>Inactive</span>
-                        )}
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* --- CORE STATS ROW --- */}
