@@ -18,8 +18,14 @@ export async function addTeamFee(data: {
     amountPerPlayer: number
     season: string
     description: string
+    selectedPlayerIds?: string[]
 }) {
-    const activePlayers = await db.player.findMany({ where: { active: true } })
+    let activePlayers = await db.player.findMany({ where: { active: true } })
+
+    // Filter if specific players were selected
+    if (data.selectedPlayerIds && data.selectedPlayerIds.length > 0) {
+        activePlayers = activePlayers.filter((p: any) => data.selectedPlayerIds!.includes(p.id))
+    }
 
     const fees = activePlayers.map((p: any) => ({
         playerId: p.id,

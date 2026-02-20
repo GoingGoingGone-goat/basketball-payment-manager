@@ -1,5 +1,6 @@
 import { getActivePlayers } from '@/actions/players'
-import { addTeamFee, logPayment } from '@/actions/finances'
+import { logPayment } from '@/actions/finances'
+import { AddTeamFeeForm } from './AddTeamFeeForm'
 
 export default async function FinancesPage() {
     const activePlayers = await getActivePlayers()
@@ -13,20 +14,8 @@ export default async function FinancesPage() {
                 {/* Charge Team Fee */}
                 <div className="glass-panel" style={{ padding: '2rem' }}>
                     <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>Charge Team Fee</h2>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Applies a fee to ALL active players</p>
-                    <form action={async (formData) => {
-                        'use server'
-                        await addTeamFee({
-                            amountPerPlayer: Number(formData.get('amount')),
-                            season: formData.get('season') as string,
-                            description: formData.get('description') as string
-                        })
-                    }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <input type="number" name="amount" required placeholder="Amount per player ($)" step="0.01" className="input-field" />
-                        <input type="text" name="season" required placeholder="Season (e.g., Summer 2024)" className="input-field" />
-                        <input type="text" name="description" required placeholder="Description (e.g., Rego Fee)" className="input-field" />
-                        <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>Add Team Fee</button>
-                    </form>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Charge specific active players</p>
+                    <AddTeamFeeForm activePlayers={activePlayers} />
                 </div>
 
                 {/* Log Payment */}
