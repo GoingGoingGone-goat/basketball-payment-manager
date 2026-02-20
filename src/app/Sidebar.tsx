@@ -21,7 +21,6 @@ export function Sidebar() {
                 <h2 className="title-gradient" style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', lineHeight: '1.3' }}>
                     <span style={{ fontSize: '1.5rem' }}>🏀</span> Basketball Payment Manager
                 </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.2rem' }}>Team MVP Manager</p>
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -57,7 +56,7 @@ export function Sidebar() {
             </nav>
 
             <div style={{ marginTop: 'auto', paddingTop: '2rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                &copy; {new Date().getFullYear()} Team MVP
+                &copy; {new Date().getFullYear()} McBallers
             </div>
         </aside>
     )

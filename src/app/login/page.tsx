@@ -27,11 +27,11 @@ export default function LoginPage() {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '2rem' }}>
             <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '3rem 2rem', textAlign: 'center' }}>
-                <div style={{ width: '60px', height: '60px', background: 'var(--accent-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)' }}>
-                    <span style={{ fontSize: '1.8rem' }}>🏀</span>
+                <div style={{ width: '120px', height: '120px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', overflow: 'hidden', border: '3px solid rgba(255,255,255,0.1)' }}>
+                    <img src="/logo.png" alt="McBallers Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
 
-                <h1 className="title-gradient" style={{ fontSize: '2rem', marginBottom: '0.5rem', margin: '0 0 0.5rem 0' }}>MCBallers</h1>
+                <h1 className="title-gradient" style={{ fontSize: '2rem', marginBottom: '0.5rem', margin: '0 0 0.5rem 0' }}>McBallers</h1>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Enter the squad password to access the manager.</p>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
