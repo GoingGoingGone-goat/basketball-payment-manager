@@ -18,27 +18,35 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
 
         let totalPoints = 0
         let wins = 0
-        let totalThrees = 0
         let totalFouls = 0
+        let totalTeamPoints = 0
+        let totalOppPoints = 0
 
         playerGames.forEach((g: any) => {
             const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
             if (pStat) {
                 totalPoints += pStat.points
-                totalThrees += pStat.threes
                 totalFouls += pStat.fouls
+                totalTeamPoints += g.teamScore
+                totalOppPoints += g.opponentScore
             }
             if (g.result === 'W') wins++
         })
+
+        const oRtg = totalGames > 0 ? (totalTeamPoints / totalGames) : 0
+        const dRtg = totalGames > 0 ? (totalOppPoints / totalGames) : 0
+        const netRtg = oRtg - dRtg
 
         return {
             player,
             gamesPlayed: totalGames,
             totalPoints,
-            totalThrees,
             totalFouls,
             ppg: totalGames > 0 ? totalPoints / totalGames : 0,
-            winPct: totalGames > 0 ? (wins / totalGames) * 100 : 0
+            winPct: totalGames > 0 ? (wins / totalGames) * 100 : 0,
+            oRtg,
+            dRtg,
+            netRtg
         }
     }).sort((a: any, b: any) => b.gamesPlayed > 0 ? b.ppg - a.ppg : b.gamesPlayed - a.gamesPlayed)
 
@@ -57,14 +65,16 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Games Played</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Total Pts</th>
                             <th style={{ padding: '1rem', color: 'var(--accent-primary)' }}>PPG</th>
-                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>3PTM</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Offensive Rtg</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Defensive Rtg</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Net Rtg</th>
                             <th style={{ padding: '1rem', color: 'var(--accent-danger)' }}>Fouls/G</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Win %</th>
                         </tr>
                     </thead>
                     <tbody>
                         {playerStats.length === 0 ? (
-                            <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No player stats available</td></tr>
+                            <tr><td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No player stats available</td></tr>
                         ) : null}
                         {playerStats.map((stat: any) => (
                             <tr key={stat.player.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }} className="hover:bg-[rgba(255,255,255,0.02)]">
@@ -74,7 +84,11 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
                                 <td style={{ padding: '1rem', color: 'var(--accent-primary)', fontWeight: 700 }}>
                                     {stat.ppg.toFixed(1)}
                                 </td>
-                                <td style={{ padding: '1rem' }}>{stat.totalThrees}</td>
+                                <td style={{ padding: '1rem' }}>{stat.oRtg.toFixed(1)}</td>
+                                <td style={{ padding: '1rem' }}>{stat.dRtg.toFixed(1)}</td>
+                                <td style={{ padding: '1rem', color: stat.netRtg > 0 ? 'var(--accent-success)' : stat.netRtg < 0 ? 'var(--accent-danger)' : 'inherit', fontWeight: 600 }}>
+                                    {stat.netRtg > 0 ? '+' : ''}{stat.netRtg.toFixed(1)}
+                                </td>
                                 <td style={{ padding: '1rem', color: 'var(--accent-danger)' }}>
                                     {stat.gamesPlayed > 0 ? (stat.totalFouls / stat.gamesPlayed).toFixed(1) : '0.0'}
                                 </td>

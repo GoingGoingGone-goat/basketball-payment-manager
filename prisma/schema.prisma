@@ -63,10 +63,11 @@ model Fee {
 }
 
 model Payment {
-  id        String   @id @default(uuid())
-  playerId  String
-  amount    Float
-  date      DateTime @default(now())
-
-  Player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  amount      Float
+  date        DateTime @default(now())
+  description String?  // Added to mirror fees
+  playerId    String
+  Player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 }

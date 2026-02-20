@@ -39,18 +39,23 @@ export async function addTeamFee(data: {
 }
 
 export async function logPayment(data: {
-    playerId: string
     amount: number
     date: Date
+    description?: string
+    selectedPlayerIds: string[]
 }) {
-    const payment = await db.payment.create({
-        data: {
-            ...data,
-            date: new Date(data.date)
-        }
+    const payments = data.selectedPlayerIds.map((playerId) => ({
+        playerId: playerId,
+        amount: data.amount,
+        date: new Date(data.date),
+        description: data.description
+    }))
+
+    await db.payment.createMany({
+        data: payments
     })
+
     revalidatePath('/')
-    return payment
 }
 
 export async function getDebtSummary() {
