@@ -3,15 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Player {
   id           String     @id @default(uuid())
   name         String
   jerseyNumber Int?       // Added from PlayHQ
+  photoUrl     String?    // Player profile image
+  height       String?    // e.g. "6'2" or "188cm"
+  weight       String?    // e.g. "190 lbs" or "86kg"
+  positions    String?    // e.g. "PG, SG"
   active       Boolean    @default(true)
   createdAt    DateTime   @default(now())
 
