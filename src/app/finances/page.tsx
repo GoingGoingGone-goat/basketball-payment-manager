@@ -20,7 +20,7 @@ export default async function FinancesPage() {
                 {/* LEFT COLUMN: Actions & Debt */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         {/* Charge Team Fee */}
                         <div className="glass-panel" style={{ padding: '2rem' }}>
                             <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>Charge Team Fee</h2>
@@ -85,7 +85,7 @@ export default async function FinancesPage() {
                         <span style={{ width: '28px' }}></span>
                     </div>
 
-                    <div style={{ flex: 1, padding: '1rem 1rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+                    <div style={{ flex: 1, padding: '1rem 1rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '600px', overflowY: 'auto' }}>
                         {transactions.length === 0 ? (
                             <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: '2rem' }}>No transactions recorded.</p>
                         ) : (
