@@ -1,8 +1,15 @@
 import { getGames } from '@/actions/games'
 import { getActivePlayers } from '@/actions/players'
+import { SeasonFilter } from './SeasonFilter'
 
-export default async function StatsPage() {
-    const games = await getGames()
+export default async function StatsPage({ searchParams }: { searchParams: any }) {
+    const sp = await searchParams;
+    const seasonFilter = sp?.season;
+
+    const allGames = await getGames()
+    const allSeasons = Array.from(new Set(allGames.map((g: any) => g.season))).filter(Boolean).sort() as string[]
+
+    const games = seasonFilter ? allGames.filter((g: any) => g.season === seasonFilter) : allGames;
     const players = await getActivePlayers()
 
     const playerStats = players.map((player: any) => {
@@ -27,36 +34,37 @@ export default async function StatsPage() {
         return {
             player,
             gamesPlayed: totalGames,
-            reliability: games.length > 0 ? (totalGames / games.length) * 100 : 0,
             totalPoints,
             totalThrees,
             totalFouls,
             ppg: totalGames > 0 ? totalPoints / totalGames : 0,
             winPct: totalGames > 0 ? (wins / totalGames) * 100 : 0
         }
-    }).sort((a: any, b: any) => b.ppg - a.ppg)
+    }).sort((a: any, b: any) => b.gamesPlayed > 0 ? b.ppg - a.ppg : b.gamesPlayed - a.gamesPlayed)
 
     return (
         <div>
-            <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Individual Player Statistics</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+                <h1 className="title-gradient" style={{ fontSize: '2.5rem', margin: 0 }}>Individual Player Statistics</h1>
+                <SeasonFilter seasons={allSeasons} />
+            </div>
 
             <div className="glass-panel" style={{ overflowX: 'auto', padding: '1rem' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr style={{ borderBottom: '1px solid var(--panel-border)' }}>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Player</th>
-                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>GP</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Games Played</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Total Pts</th>
                             <th style={{ padding: '1rem', color: 'var(--accent-primary)' }}>PPG</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>3PTM</th>
                             <th style={{ padding: '1rem', color: 'var(--accent-danger)' }}>Fouls/G</th>
                             <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Win %</th>
-                            <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Reliability</th>
                         </tr>
                     </thead>
                     <tbody>
                         {playerStats.length === 0 ? (
-                            <tr><td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No player stats available</td></tr>
+                            <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No player stats available</td></tr>
                         ) : null}
                         {playerStats.map((stat: any) => (
                             <tr key={stat.player.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }} className="hover:bg-[rgba(255,255,255,0.02)]">
@@ -73,7 +81,6 @@ export default async function StatsPage() {
                                 <td style={{ padding: '1rem', color: stat.winPct > 50 ? 'var(--accent-success)' : stat.winPct < 40 ? 'var(--accent-danger)' : 'inherit' }}>
                                     {stat.winPct.toFixed(1)}%
                                 </td>
-                                <td style={{ padding: '1rem' }}>{stat.reliability.toFixed(0)}%</td>
                             </tr>
                         ))}
                     </tbody>
