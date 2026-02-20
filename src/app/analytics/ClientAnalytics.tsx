@@ -183,7 +183,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         </div>
                         <div className="glass-card">
                             <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Defensive Rating</h3>
-                            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent-danger)' }}>{stats.dRtg.toFixed(1)} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Cncdd</span></div>
+                            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent-danger)' }}>{stats.dRtg.toFixed(1)} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>PPG Conceded</span></div>
                         </div>
                         <div className="glass-card">
                             <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Net Rating</h3>
