@@ -63,7 +63,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                         <Target size={14} />
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Consistency Index</span>
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(1.00 = Perfect)</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        Their predictability at scoring (<span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>1.0 = perfect</span>)
+                    </span>
                     <span style={{ fontSize: '2.5rem', fontWeight: 800, color: Number(careerStats.consistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(careerStats.consistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)', marginTop: '0.5rem' }}>
                         {careerStats.consistencyIndex}
                     </span>
@@ -75,7 +77,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                         <Activity size={14} />
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Fixed Band Rate</span>
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(±5 Pts from Mean)</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        (within ±5 points of average) means in about <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{careerStats.consistencyRate} out of 100</span> games they scored around their average
+                    </span>
                     <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)', marginTop: '0.5rem' }}>
                         {careerStats.consistencyRate}%
                     </span>
@@ -87,7 +91,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                         <Activity size={14} />
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>MAD</span>
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(Mean Abs. Deviation)</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        Means their typical game is only about <span style={{ color: 'var(--accent-warning)', fontWeight: 600 }}>{careerStats.mad} points</span> away from their average
+                    </span>
                     <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-warning)', marginTop: '0.5rem' }}>
                         ±{careerStats.mad}
                     </span>
