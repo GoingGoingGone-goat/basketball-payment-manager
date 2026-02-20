@@ -1,6 +1,6 @@
-import { getGames, deleteGame } from '@/actions/games'
+import { getGames } from '@/actions/games'
 import { format } from 'date-fns'
-import { Trash2 } from 'lucide-react'
+import { DeleteGameButton } from '../DeleteGameButton'
 
 export default async function OpponentsPage() {
     const games = await getGames()
@@ -37,16 +37,7 @@ export default async function OpponentsPage() {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
                                             <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                 {format(new Date(game.date), 'MMMM d, yyyy')}
-                                                <form action={async () => {
-                                                    'use server'
-                                                    await deleteGame(game.id)
-                                                }}>
-                                                    <button type="submit" style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }} onClick={(e) => {
-                                                        if (!confirm('Are you sure you want to delete this game?')) e.preventDefault()
-                                                    }}>
-                                                        <Trash2 size={16} className="hover:text-[var(--accent-danger)] transition-colors" />
-                                                    </button>
-                                                </form>
+                                                <DeleteGameButton gameId={game.id} />
                                             </span>
                                             <span style={{
                                                 fontWeight: 700,

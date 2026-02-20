@@ -2,8 +2,8 @@ import { getDebtSummary, getFinancesTotals } from '@/actions/finances'
 import { getGames, deleteGame } from '@/actions/games'
 import { getActivePlayers } from '@/actions/players'
 import { format } from 'date-fns'
-import { Trash2 } from 'lucide-react'
 import { CopyButton } from './CopyButton'
+import { DeleteGameButton } from './DeleteGameButton'
 
 export default async function Dashboard() {
   const [debtSummary, { totalDebt }, games, activePlayers] = await Promise.all([
@@ -112,16 +112,7 @@ export default async function Dashboard() {
                     </span>
                   </div>
 
-                  <form action={async () => {
-                    'use server'
-                    await deleteGame(game.id)
-                  }}>
-                    <button type="submit" style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }} onClick={(e) => {
-                      if (!confirm('Are you sure you want to delete this game and all associated stats?')) e.preventDefault()
-                    }}>
-                      <Trash2 size={18} className="hover:text-[var(--accent-danger)] transition-colors" />
-                    </button>
-                  </form>
+                  <DeleteGameButton gameId={game.id} />
                 </div>
               ))
             )}
