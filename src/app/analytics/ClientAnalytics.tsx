@@ -62,6 +62,21 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                 return sum + (pStat?.points || 0)
             }, 0);
 
+            const ones = playerGames.reduce((sum: number, g: any) => {
+                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
+                return sum + (pStat?.ones || 0)
+            }, 0);
+
+            const twos = playerGames.reduce((sum: number, g: any) => {
+                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
+                return sum + (pStat?.twos || 0)
+            }, 0);
+
+            const threes = playerGames.reduce((sum: number, g: any) => {
+                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
+                return sum + (pStat?.threes || 0)
+            }, 0);
+
             if (gp < minGames) {
                 return {
                     id: player.id,
@@ -70,7 +85,8 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     ptsScored: ptsScored,
                     meetsMin: false,
                     oRtg: 0, dRtg: 0, netRtg: 0,
-                    efficiency: 0, luckyCharm: 0
+                    efficiency: 0, luckyCharm: 0,
+                    onesPerGame: 0, twosPerGame: 0, threesPerGame: 0
                 }
             }
 
@@ -92,7 +108,10 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                 oRtg: teamPtsScored / gp,
                 dRtg: teamPtsConceded / gp,
                 netRtg: (teamPtsScored / gp) - (teamPtsConceded / gp),
-                efficiency, luckyCharm
+                efficiency, luckyCharm,
+                onesPerGame: ones / gp,
+                twosPerGame: twos / gp,
+                threesPerGame: threes / gp
             }
         }) as any[]
 
@@ -106,6 +125,10 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const efficiency = [...eligible].sort((a, b) => b.efficiency - a.efficiency)
         const reliability = [...individualStats].filter(p => p.gamesPlayed > 0).sort((a, b) => b.gamesPlayed - a.gamesPlayed)
         const luckyCharm = [...eligible].sort((a, b) => b.luckyCharm - a.luckyCharm || b.gamesPlayed - a.gamesPlayed)
+
+        const onesBoard = [...eligible].sort((a, b) => b.onesPerGame - a.onesPerGame)
+        const twosBoard = [...eligible].sort((a, b) => b.twosPerGame - a.twosPerGame)
+        const threesBoard = [...eligible].sort((a, b) => b.threesPerGame - a.threesPerGame)
 
 
         // --- TEAM SYNERGY (COMBINATIONS) ---
@@ -149,6 +172,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
             totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg,
             spearhead, wall, differenceMaker,
             efficiency, reliability, luckyCharm,
+            onesBoard, twosBoard, threesBoard,
             synergyCore, synergyWinners, synergyWall
         }
     }, [games, players, minGames, seasonFilter, groupSize])
@@ -278,6 +302,78 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     </div>
 
 
+                    {/* --- INDIVIDUAL STATS (ROW 2 - Scoring Breakdown) --- */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '1.5rem' }}>
+
+                        {/* 1-Pointers */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Target size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Free Throws / Game</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Average 1-pointers scored per game (min {minGames} games).
+                            </p>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.onesBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.onesBoard.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.onesPerGame.toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 2-Pointers */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Coins size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>2-Pointers / Game</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Average 2-pointers scored per game (min {minGames} games).
+                            </p>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.twosBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.twosBoard.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.twosPerGame.toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 3-Pointers */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Flame size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>3-Pointers / Game</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Average 3-pointers scored per game (min {minGames} games).
+                            </p>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.threesBoard.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
+                                {stats.threesBoard.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.threesPerGame.toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
 
                     {/* --- INDIVIDUAL STATS (ROW 3 - Advanced Team Ratings) --- */}
