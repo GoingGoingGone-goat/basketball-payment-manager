@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Shield, Target, Crown, Users, Zap, Trophy, Flame, Coins, HeartPulse } from 'lucide-react'
+import { Shield, Target, Crown, Users, Zap, Trophy, Flame, Coins, HeartPulse, Activity } from 'lucide-react'
 
 function getCombinations<T>(array: T[], size: number): T[][] {
     const result: T[][] = []
@@ -46,10 +46,36 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const netRtg = oRtg - dRtg
 
         const activePlayerIds = new Set<string>()
-        filteredGames.forEach((g: any) => {
-            g.GameStats.forEach((s: any) => activePlayerIds.add(s.playerId))
-        })
         const activePlayersList = players.filter((p: any) => activePlayerIds.has(p.id))
+
+        let globalConsistencyIndex = '0.00'
+        let globalConsistencyRate = '0.0'
+        let globalMad = '0.0'
+
+        if (totalGamesPlayed > 0) {
+            let sumSquaredDiffs = 0;
+            let sumAbsoluteDiffs = 0;
+            let gamesInBand = 0;
+            const bandWidth = 5;
+
+            filteredGames.forEach((g: any) => {
+                const pt = g.teamScore
+                sumSquaredDiffs += Math.pow(pt - oRtg, 2)
+                sumAbsoluteDiffs += Math.abs(pt - oRtg)
+
+                if (pt >= (oRtg - bandWidth) && pt <= (oRtg + bandWidth)) {
+                    gamesInBand++
+                }
+            })
+
+            const sd = Math.sqrt(sumSquaredDiffs / totalGamesPlayed)
+            if (oRtg > 0) {
+                const cv = sd / oRtg
+                globalConsistencyIndex = (1 - cv).toFixed(2)
+            }
+            globalConsistencyRate = ((gamesInBand / totalGamesPlayed) * 100).toFixed(1)
+            globalMad = (sumAbsoluteDiffs / totalGamesPlayed).toFixed(1)
+        }
 
         // --- POWER RANKINGS (INDIVIDUAL) ---
         const individualStats = activePlayersList.map((player: any) => {
@@ -170,6 +196,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
 
         return {
             totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg,
+            globalConsistencyIndex, globalConsistencyRate, globalMad,
             spearhead, wall, differenceMaker,
             efficiency, reliability, luckyCharm,
             onesBoard, twosBoard, threesBoard,
@@ -220,6 +247,45 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             <div style={{ fontSize: '2rem', fontWeight: 700, color: stats.winPct > 50 ? 'var(--accent-success)' : 'var(--text-primary)' }}>
                                 {stats.winPct.toFixed(1)}%
                             </div>
+                        </div>
+                    </div>
+
+                    {/* --- EXPANDED CONSISTENCY METRICS ROW --- */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+                        {/* Consistency Index */}
+                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                                <Target size={14} />
+                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Consistency Index</span>
+                            </div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(1.00 = Perfect)</span>
+                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: Number(stats.globalConsistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(stats.globalConsistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)', marginTop: '0.5rem' }}>
+                                {stats.globalConsistencyIndex}
+                            </span>
+                        </div>
+
+                        {/* Fixed Band Rate */}
+                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                                <Activity size={14} />
+                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Fixed Band Rate</span>
+                            </div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(±5 Pts from Mean)</span>
+                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)', marginTop: '0.5rem' }}>
+                                {stats.globalConsistencyRate}%
+                            </span>
+                        </div>
+
+                        {/* Mean Absolute Deviation */}
+                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                                <Activity size={14} />
+                                <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>MAD</span>
+                            </div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(Mean Abs. Deviation)</span>
+                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-warning)', marginTop: '0.5rem' }}>
+                                ±{stats.globalMad}
+                            </span>
                         </div>
                     </div>
 
