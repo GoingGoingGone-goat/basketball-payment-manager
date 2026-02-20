@@ -8,7 +8,8 @@ export async function login(formData: FormData) {
 
     // Simple check against the environment variable
     if (password === process.env.APP_PASSWORD) {
-        cookies().set('auth-token', password, {
+        const cookieStore = await cookies();
+        cookieStore.set('auth-token', password, {
             secure: process.env.NODE_ENV === 'production',
             httpOnly: true,
             path: '/',
