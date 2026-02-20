@@ -35,7 +35,14 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
                 <div style={{ flex: 1, minWidth: '250px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                         <h1 className="title-gradient" style={{ fontSize: '3rem', margin: 0, lineHeight: '1.1' }}>{player.name}</h1>
-                        <EditProfileModal player={player} />
+                        <EditProfileModal player={{
+                            id: player.id,
+                            name: player.name,
+                            photoUrl: player.photoUrl,
+                            height: player.height,
+                            weight: player.weight,
+                            positions: player.positions
+                        }} />
                     </div>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '1.5rem' }}>

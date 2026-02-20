@@ -27,8 +27,8 @@ export default function LoginPage() {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '2rem' }}>
             <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '3rem 2rem', textAlign: 'center' }}>
-                <div style={{ width: '120px', height: '120px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', overflow: 'hidden', border: '3px solid rgba(255,255,255,0.1)' }}>
-                    <img src="/logo.png" alt="McBallers Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                    <img src="/logo.png" alt="McBallers Logo" style={{ width: '140px', height: 'auto', objectFit: 'contain', borderRadius: '12px' }} />
                 </div>
 
                 <h1 className="title-gradient" style={{ fontSize: '2rem', marginBottom: '0.5rem', margin: '0 0 0.5rem 0' }}>McBallers</h1>
