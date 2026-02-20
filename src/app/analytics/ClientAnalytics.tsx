@@ -70,7 +70,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     ptsScored: ptsScored,
                     meetsMin: false,
                     oRtg: 0, dRtg: 0, netRtg: 0,
-                    efficiency: 0, luckyCharm: 0, clutchFactor: 0, fightingSpirit: 0
+                    efficiency: 0, luckyCharm: 0
                 }
             }
 
@@ -83,19 +83,6 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
             const wins = playerGames.filter((g: any) => g.result === 'W')
             const luckyCharm = (wins.length / gp) * 100
 
-            const clutchPts = wins.reduce((sum: number, g: any) => {
-                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
-                return sum + (pStat?.points || 0)
-            }, 0)
-            const clutchFactor = wins.length > 0 && ptsScored > 0 ? (clutchPts / ptsScored) * 100 : 0
-
-            const losses = playerGames.filter((g: any) => g.result === 'L')
-            const fightPts = losses.reduce((sum: number, g: any) => {
-                const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
-                return sum + (pStat?.points || 0)
-            }, 0)
-            const fightingSpirit = losses.length > 0 && ptsScored > 0 ? (fightPts / ptsScored) * 100 : 0
-
             return {
                 id: player.id,
                 name: player.name,
@@ -105,26 +92,20 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                 oRtg: teamPtsScored / gp,
                 dRtg: teamPtsConceded / gp,
                 netRtg: (teamPtsScored / gp) - (teamPtsConceded / gp),
-                efficiency, luckyCharm, clutchFactor, fightingSpirit
+                efficiency, luckyCharm
             }
         }) as any[]
 
         const eligible = individualStats.filter(p => p.meetsMin)
 
-        // Old Rankings
+        // Rankings
         const spearhead = [...eligible].sort((a, b) => b.oRtg - a.oRtg);
         const wall = [...eligible].sort((a, b) => a.dRtg - b.dRtg);
         const differenceMaker = [...eligible].sort((a, b) => b.netRtg - a.netRtg);
 
-        // New Rankings
         const efficiency = [...eligible].sort((a, b) => b.efficiency - a.efficiency)
-        const goldenBoot = [...individualStats].filter(p => p.ptsScored > 0).sort((a, b) => b.ptsScored - a.ptsScored)
         const reliability = [...individualStats].filter(p => p.gamesPlayed > 0).sort((a, b) => b.gamesPlayed - a.gamesPlayed)
         const luckyCharm = [...eligible].sort((a, b) => b.luckyCharm - a.luckyCharm || b.gamesPlayed - a.gamesPlayed)
-
-        // Only include if clutchFactor/fightingSpirit have values (prevents 0% spanning the board for players who never won/lost)
-        const clutchFactor = [...eligible].filter(p => p.clutchFactor > 0).sort((a, b) => b.clutchFactor - a.clutchFactor)
-        const fightingSpirit = [...eligible].filter(p => p.fightingSpirit > 0).sort((a, b) => b.fightingSpirit - a.fightingSpirit)
 
 
         // --- TEAM SYNERGY (COMBINATIONS) ---
@@ -167,7 +148,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         return {
             totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg,
             spearhead, wall, differenceMaker,
-            efficiency, goldenBoot, reliability, luckyCharm, clutchFactor, fightingSpirit,
+            efficiency, reliability, luckyCharm,
             synergyCore, synergyWinners, synergyWall
         }
     }, [games, players, minGames, seasonFilter, groupSize])
@@ -249,34 +230,11 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                             </div>
                         </div>
 
-                        {/* Golden Boot */}
-                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <Trophy size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Golden Boot</h3>
-                            </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
-                                Total points scored across all games.
-                            </p>
-                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                {stats.goldenBoot.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players have scored yet.</div>}
-                                {stats.goldenBoot.map((p, idx) => (
-                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
-                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
-                                        </div>
-                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.ptsScored}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Reliability */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <Shield size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Reliability</h3>
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Games Attended</h3>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
                                 Total number of games attended.
@@ -294,17 +252,12 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                                 ))}
                             </div>
                         </div>
-                    </div>
-
-
-                    {/* --- INDIVIDUAL STATS (ROW 2) --- */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '350px', marginBottom: '1.5rem' }}>
 
                         {/* Lucky Charm */}
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <Crown size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Lucky Charm</h3>
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Win %</h3>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
                                 % of games won when this player is playing (min {minGames} games).
@@ -322,53 +275,9 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                                 ))}
                             </div>
                         </div>
-
-                        {/* Clutch Factor */}
-                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <Zap size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Clutch Factor</h3>
-                            </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
-                                % of points scored in winning games (min {minGames} games).
-                            </p>
-                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                {stats.clutchFactor.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.clutchFactor.map((p, idx) => (
-                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
-                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
-                                        </div>
-                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.clutchFactor.toFixed(1)}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Fighting Spirit */}
-                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <Flame size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Fighting Spirit</h3>
-                            </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
-                                % of points scored in losing games (min {minGames} games).
-                            </p>
-                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                {stats.fightingSpirit.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the requirement.</div>}
-                                {stats.fightingSpirit.map((p, idx) => (
-                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                            <span style={{ fontSize: '0.75rem', width: '20px', textAlign: 'center', color: idx < 3 ? 'var(--accent-warning)' : 'var(--text-muted)', fontWeight: 700 }}>{idx + 1}</span>
-                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
-                                        </div>
-                                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{p.fightingSpirit.toFixed(1)}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
+
+
 
 
                     {/* --- INDIVIDUAL STATS (ROW 3 - Advanced Team Ratings) --- */}
@@ -378,7 +287,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <Coins size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Spearhead</h3>
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Offensive Rating</h3>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
                                 Offensive Rating: Average points scored by the team when playing (min {minGames} games).
@@ -401,7 +310,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <Shield size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Individual Wall</h3>
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Defensive Rating</h3>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
                                 Defensive Rating: Average points conceded by the team when playing (min {minGames} games).
@@ -424,7 +333,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <HeartPulse size={20} color="var(--accent-primary)" />
-                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Difference Maker</h3>
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Net Rating</h3>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
                                 Net Rating: Average point difference when playing (min {minGames} games).
@@ -451,12 +360,12 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     {/* --- TEAM SYNERGY --- */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                         <h2 style={{ fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-                            <Users color="var(--accent-success)" /> Team Synergy <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400 }}>({groupSize === 2 ? 'Duos' : groupSize === 3 ? 'Trios' : groupSize === 4 ? 'Quartets' : '5s'})</span>
+                            <Users color="var(--accent-success)" /> Team Synergy <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400 }}>({groupSize === 3 ? 'Trios' : groupSize === 4 ? 'Quartets' : '5s'})</span>
                         </h2>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginRight: '0.5rem' }}>Group Size:</span>
-                            {[2, 3, 4, 5].map(size => (
+                            {[3, 4, 5].map(size => (
                                 <button
                                     key={size}
                                     type="button"
@@ -474,7 +383,7 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                                         transition: 'all 0.2s'
                                     }}
                                 >
-                                    {size === 2 ? 'Duos (x2)' : size === 3 ? 'Trios (x3)' : size === 4 ? 'Quartets (x4)' : '5s (x5)'}
+                                    {size === 3 ? 'Trios (x3)' : size === 4 ? 'Quartets (x4)' : '5s (x5)'}
                                 </button>
                             ))}
                         </div>
