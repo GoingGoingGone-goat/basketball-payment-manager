@@ -2,8 +2,9 @@ import { getPlayerDetail, updatePlayerProfile } from '@/actions/players'
 import Link from 'next/link'
 import { ArrowLeft, User, Ruler, Weight, Shield, Coins, Activity, Flame, Target } from 'lucide-react'
 
-export default async function PlayerProfilePage({ params }: { params: { id: string } }) {
-    const player = await getPlayerDetail(params.id)
+export default async function PlayerProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const player = await getPlayerDetail(id)
 
     if (!player) {
         return <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Player not found.</div>
