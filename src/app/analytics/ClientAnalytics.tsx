@@ -1,29 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-
-function getCombinations<T>(array: T[], size: number): T[][] {
-    const result: T[][] = []
-    function recurse(start: number, combo: T[]) {
-        if (combo.length === size) {
-            result.push([...combo])
-            return
-        }
-        for (let i = start; i < array.length; i++) {
-            combo.push(array[i])
-            recurse(i + 1, combo)
-            combo.pop()
-        }
-    }
-    recurse(0, [])
-    return result
-}
+import { Shield, Target, Crown } from 'lucide-react'
 
 export default function ClientAnalytics({ initialData }: { initialData: any }) {
     const { games, players, seasons } = initialData
 
-    const [groupSize, setGroupSize] = useState(3)
-    const [minGames, setMinGames] = useState(1)
+    const [minGames, setMinGames] = useState(3)
     const [seasonFilter, setSeasonFilter] = useState('All')
 
     const stats = useMemo(() => {
@@ -40,8 +23,8 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const totalPointsScored = filteredGames.reduce((sum: number, g: any) => sum + g.teamScore, 0)
         const totalPointsConceded = filteredGames.reduce((sum: number, g: any) => sum + g.opponentScore, 0)
 
-        const oRtg = totalPointsScored / totalGamesPlayed
-        const dRtg = totalPointsConceded / totalGamesPlayed
+        const oRtg = totalGamesPlayed > 0 ? totalPointsScored / totalGamesPlayed : 0
+        const dRtg = totalGamesPlayed > 0 ? totalPointsConceded / totalGamesPlayed : 0
         const netRtg = oRtg - dRtg
 
         const activePlayerIds = new Set<string>()
@@ -50,45 +33,30 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         })
         const activePlayersList = players.filter((p: any) => activePlayerIds.has(p.id))
 
-        if (groupSize > activePlayersList.length) {
-            return { totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg, mostGames: null, highestWinPct: null, theWall: null }
-        }
+        const individualStats = activePlayersList.map((player: any) => {
+            const playerGames = filteredGames.filter((g: any) => g.GameStats.some((s: any) => s.playerId === player.id));
+            const gp = playerGames.length;
+            if (gp < minGames) return null;
 
-        const playerCombos = getCombinations(activePlayersList, groupSize)
-        const comboStats = playerCombos.map(combo => {
-            const comboIds = combo.map((p: any) => p.id)
-
-            const comboGames = filteredGames.filter((g: any) => {
-                const gamePlayerIds = new Set(g.GameStats.map((s: any) => s.playerId))
-                return comboIds.every(id => gamePlayerIds.has(id))
-            })
-
-            const gp = comboGames.length
-            if (gp < minGames) return null
-
-            const wins = comboGames.filter((g: any) => g.result === 'W').length
-            const ptsScored = comboGames.reduce((sum: number, g: any) => sum + g.teamScore, 0)
-            const ptsConceded = comboGames.reduce((sum: number, g: any) => sum + g.opponentScore, 0)
+            const ptsScored = playerGames.reduce((sum: number, g: any) => sum + g.teamScore, 0);
+            const ptsConceded = playerGames.reduce((sum: number, g: any) => sum + g.opponentScore, 0);
 
             return {
-                comboNames: combo.map((p: any) => p.name).join(', '),
+                id: player.id,
+                name: player.name,
                 gamesPlayed: gp,
-                winPct: (wins / gp) * 100,
                 oRtg: ptsScored / gp,
                 dRtg: ptsConceded / gp,
                 netRtg: (ptsScored / gp) - (ptsConceded / gp)
             }
         }).filter(Boolean) as any[]
 
-        let mostGames = null, highestWinPct = null, theWall = null
-        if (comboStats.length > 0) {
-            mostGames = [...comboStats].sort((a, b) => b.gamesPlayed - a.gamesPlayed)[0]
-            highestWinPct = [...comboStats].sort((a, b) => b.winPct - a.winPct || b.gamesPlayed - a.gamesPlayed)[0]
-            theWall = [...comboStats].sort((a, b) => a.dRtg - b.dRtg || b.gamesPlayed - a.gamesPlayed)[0]
-        }
+        const spearhead = [...individualStats].sort((a, b) => b.oRtg - a.oRtg);
+        const wall = [...individualStats].sort((a, b) => a.dRtg - b.dRtg);
+        const differenceMaker = [...individualStats].sort((a, b) => b.netRtg - a.netRtg);
 
-        return { totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg, mostGames, highestWinPct, theWall }
-    }, [games, players, groupSize, minGames, seasonFilter])
+        return { totalWins, totalGamesPlayed, winPct, oRtg, dRtg, netRtg, spearhead, wall, differenceMaker }
+    }, [games, players, minGames, seasonFilter])
 
     return (
         <div>
@@ -101,15 +69,9 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                     </select>
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Group Size</label>
-                    <select value={groupSize} onChange={e => setGroupSize(Number(e.target.value))} className="input-field" style={{ width: '200px' }}>
-                        {[2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Players</option>)}
-                    </select>
-                </div>
-                <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Min Games Played</label>
                     <select value={minGames} onChange={e => setMinGames(Number(e.target.value))} className="input-field" style={{ width: '200px' }}>
-                        {[1, 3, 5, 10, 15, 20].map(n => <option key={n} value={n}>{n} Matches</option>)}
+                        {[1, 2, 3, 5, 10, 15].map(n => <option key={n} value={n}>{n} Matches</option>)}
                     </select>
                 </div>
             </div>
@@ -141,59 +103,91 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
                         </div>
                     </div>
 
-                    <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>Group Combinations</h2>
+                    <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ color: 'var(--accent-warning)' }}>⚡</span> Power Rankings <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400 }}>(Individual Impact)</span>
+                    </h2>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                        {/* Core */}
-                        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                            <div style={{ color: 'var(--accent-secondary)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>The Core</div>
-                            <h3 style={{ marginBottom: '1rem' }}>Most Games Together</h3>
-                            {stats.mostGames ? (
-                                <>
-                                    <div style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{stats.mostGames.comboNames}</div>
-                                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                        <span><strong>{stats.mostGames.gamesPlayed}</strong> Games</span>
-                                        <span><strong>{stats.mostGames.winPct.toFixed(1)}%</strong> Win</span>
-                                    </div>
-                                </>
-                            ) : (
-                                <div style={{ color: 'var(--text-muted)' }}>No group meets the requirement.</div>
-                            )}
-                        </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', height: '500px' }}>
+                        {/* The Spearhead */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Target size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Spearhead</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Offensive Rating: Average points scored by the team when this player is playing (Higher is better, min {minGames} games).
+                            </p>
 
-                        {/* Highest Win % */}
-                        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                            <div style={{ color: 'var(--accent-success)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>The Winners</div>
-                            <h3 style={{ marginBottom: '1rem' }}>Highest Win %</h3>
-                            {stats.highestWinPct ? (
-                                <>
-                                    <div style={{ color: 'var(--accent-success)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{stats.highestWinPct.comboNames}</div>
-                                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                        <span><strong>{stats.highestWinPct.winPct.toFixed(1)}%</strong> Win</span>
-                                        <span><strong>{stats.highestWinPct.gamesPlayed}</strong> Games</span>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.spearhead.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the minimum games requirement.</div>}
+                                {stats.spearhead.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.8rem', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: idx === 0 || idx === 1 || idx === 2 ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: idx === 0 || idx === 1 || idx === 2 ? 'var(--accent-warning)' : 'var(--text-muted)', borderRadius: '50%', fontWeight: 700 }}>
+                                                {idx + 1}
+                                            </span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{p.oRtg.toFixed(2)}</span>
                                     </div>
-                                </>
-                            ) : (
-                                <div style={{ color: 'var(--text-muted)' }}>No group meets the requirement.</div>
-                            )}
+                                ))}
+                            </div>
                         </div>
 
                         {/* The Wall */}
-                        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                            <div style={{ color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>The Wall</div>
-                            <h3 style={{ marginBottom: '1rem' }}>Lowest Pts Conceded</h3>
-                            {stats.theWall ? (
-                                <>
-                                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{stats.theWall.comboNames}</div>
-                                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                        <span><strong>{stats.theWall.dRtg.toFixed(1)}</strong> DRtg</span>
-                                        <span><strong>{stats.theWall.gamesPlayed}</strong> Games</span>
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Shield size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Individual Wall</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Defensive Rating: Average points conceded by the team when this player is playing (Lower is better, min {minGames} games).
+                            </p>
+
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.wall.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the minimum games requirement.</div>}
+                                {stats.wall.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.8rem', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: idx === 0 || idx === 1 || idx === 2 ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: idx === 0 || idx === 1 || idx === 2 ? 'var(--accent-warning)' : 'var(--text-muted)', borderRadius: '50%', fontWeight: 700 }}>
+                                                {idx + 1}
+                                            </span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{p.dRtg.toFixed(2)}</span>
                                     </div>
-                                </>
-                            ) : (
-                                <div style={{ color: 'var(--text-muted)' }}>No group meets the requirement.</div>
-                            )}
+                                ))}
+                            </div>
                         </div>
+
+                        {/* Difference Maker */}
+                        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Crown size={20} color="var(--accent-primary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>The Difference Maker</h3>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                                Net Rating: Average point difference when this player is playing (Higher is better, min {minGames} games).
+                            </p>
+
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {stats.differenceMaker.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No players meet the minimum games requirement.</div>}
+                                {stats.differenceMaker.map((p, idx) => (
+                                    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <span style={{ fontSize: '0.8rem', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: idx === 0 || idx === 1 || idx === 2 ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: idx === 0 || idx === 1 || idx === 2 ? 'var(--accent-warning)' : 'var(--text-muted)', borderRadius: '50%', fontWeight: 700 }}>
+                                                {idx + 1}
+                                            </span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{p.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, fontSize: '1.1rem', color: p.netRtg > 0 ? 'var(--accent-success)' : p.netRtg < 0 ? 'var(--accent-danger)' : 'var(--text-primary)' }}>
+                                            {p.netRtg > 0 ? '+' : ''}{p.netRtg.toFixed(2)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
                 </>
             )}
