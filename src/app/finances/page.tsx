@@ -15,62 +15,62 @@ export default async function FinancesPage() {
         <div>
             <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Finances & Fees</h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+            {/* TOP ROW: Actions */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
 
-                {/* LEFT COLUMN: Actions & Debt */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {/* Charge Team Fee */}
-                        <div className="glass-panel" style={{ padding: '2rem' }}>
-                            <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>Charge Team Fee</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Charge specific active players</p>
-                            <AddTeamFeeForm activePlayers={activePlayers} />
-                        </div>
-
-                        {/* Log Payment */}
-                        <div className="glass-panel" style={{ padding: '2rem' }}>
-                            <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-success)' }}>Record Payment</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Record a player's transaction</p>
-                            <form action={async (formData) => {
-                                'use server'
-                                await logPayment({
-                                    playerId: formData.get('playerId') as string,
-                                    amount: Number(formData.get('amount')),
-                                    date: new Date(formData.get('date') as string)
-                                })
-                            }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <select name="playerId" required className="input-field">
-                                    <option value="">Select Player</option>
-                                    {activePlayers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                </select>
-                                <input type="number" name="amount" required placeholder="Amount paid ($)" step="0.01" className="input-field" />
-                                <input type="date" name="date" required defaultValue={new Date().toISOString().split('T')[0]} className="input-field" />
-                                <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', background: 'var(--accent-success)', color: 'black', fontWeight: 600 }}>Log Payment</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    {/* Debt List */}
-                    <div className="glass-panel" style={{ padding: '2rem' }}>
-                        <h2 style={{ marginBottom: '1.5rem' }}>Active Debt List</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                            {debtSummary.filter((d: any) => d.debt > 0).length === 0 ? (
-                                <p style={{ color: 'var(--text-muted)' }}>No outstanding debts. Great job team!</p>
-                            ) : (
-                                debtSummary.filter((d: any) => d.debt > 0).map((d: any) => (
-                                    <div key={d.player.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
-                                        <span style={{ fontWeight: 500 }}>{d.player.name}</span>
-                                        <span style={{ color: 'var(--accent-danger)', fontWeight: 600 }}>${d.debt.toFixed(2)}</span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
+                {/* Charge Team Fee (Top Left) */}
+                <div className="glass-panel" style={{ padding: '2rem' }}>
+                    <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>Charge Team Fee</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Charge specific active players</p>
+                    <AddTeamFeeForm activePlayers={activePlayers} />
                 </div>
 
-                {/* RIGHT COLUMN: Transaction History */}
+                {/* Log Payment (Top Right) */}
+                <div className="glass-panel" style={{ padding: '2rem' }}>
+                    <h2 style={{ marginBottom: '0.5rem', color: 'var(--accent-success)' }}>Record Payment</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Record a player's transaction</p>
+                    <form action={async (formData) => {
+                        'use server'
+                        await logPayment({
+                            playerId: formData.get('playerId') as string,
+                            amount: Number(formData.get('amount')),
+                            date: new Date(formData.get('date') as string)
+                        })
+                    }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <select name="playerId" required className="input-field">
+                            <option value="">Select Player</option>
+                            {activePlayers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                        <input type="number" name="amount" required placeholder="Amount paid ($)" step="0.01" className="input-field" />
+                        <input type="date" name="date" required defaultValue={new Date().toISOString().split('T')[0]} className="input-field" />
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', background: 'var(--accent-success)', color: 'black', fontWeight: 600 }}>Log Payment</button>
+                    </form>
+                </div>
+
+            </div>
+
+
+            {/* BOTTOM ROW: History & Debt */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+
+                {/* Active Debt (Bottom Left) */}
+                <div className="glass-panel" style={{ padding: '2rem' }}>
+                    <h2 style={{ marginBottom: '1.5rem' }}>Active Debt List</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                        {debtSummary.filter((d: any) => d.debt > 0).length === 0 ? (
+                            <p style={{ color: 'var(--text-muted)' }}>No outstanding debts. Great job team!</p>
+                        ) : (
+                            debtSummary.filter((d: any) => d.debt > 0).map((d: any) => (
+                                <div key={d.player.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
+                                    <span style={{ fontWeight: 500 }}>{d.player.name}</span>
+                                    <span style={{ color: 'var(--accent-danger)', fontWeight: 600 }}>${d.debt.toFixed(2)}</span>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Transaction History (Bottom Right) */}
                 <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ padding: '2rem 2rem 1rem 2rem' }}>
                         <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
@@ -85,7 +85,8 @@ export default async function FinancesPage() {
                         <span style={{ width: '28px' }}></span>
                     </div>
 
-                    <div style={{ flex: 1, padding: '1rem 1rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '600px', overflowY: 'auto' }}>
+                    {/* Transaction List Container - Set height to match roughly with the debt list */}
+                    <div style={{ flex: 1, padding: '1rem 1rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '500px', overflowY: 'auto' }}>
                         {transactions.length === 0 ? (
                             <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: '2rem' }}>No transactions recorded.</p>
                         ) : (
