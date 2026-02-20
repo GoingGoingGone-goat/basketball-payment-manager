@@ -131,7 +131,7 @@ export default function GameForm({ players, pastOpponents = [] }: { players: any
 
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2.5rem', border: '1px dashed var(--panel-border)' }}>
                 <h4 style={{ marginBottom: '1rem', color: 'var(--accent-primary)', fontSize: '1.1rem' }}>Smart Paste: PlayHQ Stats</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Highlight and copy the rows from the "Player Statistics" table on PlayHQ and paste them below.</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Toggle 'Show advanced stats' on. Highlight and copy the rows from the "Player Statistics" table on PlayHQ and paste them below.</p>
                 <textarea
                     value={rawPaste}
                     onChange={e => setRawPaste(e.target.value)}
