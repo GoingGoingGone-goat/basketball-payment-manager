@@ -55,6 +55,45 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                 </div>
             </div>
 
+            {/* --- EXPANDED CONSISTENCY METRICS ROW --- */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                {/* Consistency Index */}
+                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                        <Target size={14} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Consistency Index</span>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(1.00 = Perfect)</span>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: Number(careerStats.consistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(careerStats.consistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)', marginTop: '0.5rem' }}>
+                        {careerStats.consistencyIndex}
+                    </span>
+                </div>
+
+                {/* Fixed Band Rate */}
+                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                        <Activity size={14} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Fixed Band Rate</span>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(±5 Pts from Mean)</span>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)', marginTop: '0.5rem' }}>
+                        {careerStats.consistencyRate}%
+                    </span>
+                </div>
+
+                {/* Mean Absolute Deviation */}
+                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                        <Activity size={14} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>MAD</span>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(Mean Abs. Deviation)</span>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-warning)', marginTop: '0.5rem' }}>
+                        ±{careerStats.mad}
+                    </span>
+                </div>
+            </div>
+
             {/* --- DETAILED SPLITS & METRICS --- */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
 
@@ -90,19 +129,6 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                             </div>
                             <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
                                 <div style={{ height: '100%', width: `${careerStats.threesPct}%`, background: 'var(--accent-primary)' }} />
-                            </div>
-                        </div>
-
-                        {/* Consistency Metric Box */}
-                        <div style={{ marginTop: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Scoring Consistency</span>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Index (1.00 = perfect)</span>
-                                </div>
-                                <span style={{ fontWeight: 800, fontSize: '1.2rem', color: Number(careerStats.consistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(careerStats.consistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'var(--text-primary)' }}>
-                                    {careerStats.consistencyIndex}
-                                </span>
                             </div>
                         </div>
                     </div>

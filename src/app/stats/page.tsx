@@ -28,6 +28,8 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
         let totalTwos = 0
         let totalThrees = 0
 
+        const pointsArray: number[] = []
+
         playerGames.forEach((g: any) => {
             const pStat = g.GameStats.find((s: any) => s.playerId === player.id)
             if (pStat) {
@@ -38,9 +40,24 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
                 totalThrees += pStat.threes * 3
                 totalTeamPoints += g.teamScore
                 totalOppPoints += g.opponentScore
+                pointsArray.push(pStat.points)
             }
             if (g.result === 'W') wins++
         })
+
+        let consistencyIndex = '0.00'
+        if (totalGames > 0) {
+            const meanPoints = totalPoints / totalGames
+            let sumSquaredDiffs = 0
+            pointsArray.forEach(p => {
+                sumSquaredDiffs += Math.pow(p - meanPoints, 2)
+            })
+            const sd = Math.sqrt(sumSquaredDiffs / totalGames)
+            if (meanPoints > 0) {
+                const cv = sd / meanPoints
+                consistencyIndex = (1 - cv).toFixed(2)
+            }
+        }
 
         const onesPct = totalPoints > 0 ? (totalOnes / totalPoints) * 100 : 0
         const twosPct = totalPoints > 0 ? (totalTwos / totalPoints) * 100 : 0
@@ -62,7 +79,8 @@ export default async function StatsPage({ searchParams }: { searchParams: any })
             netRtg,
             onesPct,
             twosPct,
-            threesPct
+            threesPct,
+            consistencyIndex
         }
     }).sort((a: any, b: any) => b.gamesPlayed > 0 ? b.ppg - a.ppg : b.gamesPlayed - a.gamesPlayed)
 

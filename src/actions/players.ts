@@ -108,17 +108,33 @@ export async function getPlayerDetail(id: string) {
     }
 
     let consistencyIndex = '0.00';
+    let consistencyRate = '0.0';
+    let mad = '0.0';
+
     if (gp > 0) {
         const meanPoints = totalPoints / gp;
         let sumSquaredDiffs = 0;
+        let sumAbsoluteDiffs = 0;
+        let gamesInBand = 0;
+        const bandWidth = 5;
+
         pointsArray.forEach((p: number) => {
             sumSquaredDiffs += Math.pow(p - meanPoints, 2);
+            sumAbsoluteDiffs += Math.abs(p - meanPoints);
+
+            if (p >= (meanPoints - bandWidth) && p <= (meanPoints + bandWidth)) {
+                gamesInBand++;
+            }
         });
+
         const sd = Math.sqrt(sumSquaredDiffs / gp);
         if (meanPoints > 0) {
             const cv = sd / meanPoints;
             consistencyIndex = (1 - cv).toFixed(2);
         }
+
+        consistencyRate = ((gamesInBand / gp) * 100).toFixed(1);
+        mad = (sumAbsoluteDiffs / gp).toFixed(1);
     }
 
     const allGames = await db.game.findMany();
@@ -149,7 +165,9 @@ export async function getPlayerDetail(id: string) {
             dRtg,
             netRtg,
             totalPoints,
-            consistencyIndex
+            consistencyIndex,
+            consistencyRate,
+            mad
         },
         teamAverages: {
             oRtg: teamAvgORtg,

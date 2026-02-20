@@ -37,6 +37,7 @@ export function ClientStatsTable({ playerStats }: { playerStats: any[] }) {
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Off Rtg</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Def Rtg</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Net Rtg</th>
+                                    <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Cons. Idx</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>1PT%</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>2PT%</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>3PT%</th>
@@ -72,6 +73,9 @@ export function ClientStatsTable({ playerStats }: { playerStats: any[] }) {
                                         <td style={{ padding: '1rem' }}>{stat.dRtg.toFixed(1)}</td>
                                         <td style={{ padding: '1rem', color: stat.netRtg > 0 ? 'var(--accent-success)' : stat.netRtg < 0 ? 'var(--accent-danger)' : 'inherit', fontWeight: 600 }}>
                                             {stat.netRtg > 0 ? '+' : ''}{stat.netRtg.toFixed(1)}
+                                        </td>
+                                        <td style={{ padding: '1rem', fontWeight: 700, color: Number(stat.consistencyIndex) >= 0.8 ? 'var(--accent-success)' : Number(stat.consistencyIndex) >= 0.6 ? 'var(--accent-warning)' : 'inherit' }}>
+                                            {stat.consistencyIndex}
                                         </td>
                                         <td style={{ padding: '1rem' }}>{stat.onesPct.toFixed(1)}%</td>
                                         <td style={{ padding: '1rem' }}>{stat.twosPct.toFixed(1)}%</td>
