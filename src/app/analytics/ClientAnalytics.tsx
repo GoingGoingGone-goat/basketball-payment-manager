@@ -46,6 +46,9 @@ export default function ClientAnalytics({ initialData }: { initialData: any }) {
         const netRtg = oRtg - dRtg
 
         const activePlayerIds = new Set<string>()
+        filteredGames.forEach((g: any) => {
+            g.GameStats.forEach((s: any) => activePlayerIds.add(s.playerId))
+        })
         const activePlayersList = players.filter((p: any) => activePlayerIds.has(p.id))
 
         // --- POWER RANKINGS (INDIVIDUAL) ---
