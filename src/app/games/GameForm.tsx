@@ -10,7 +10,7 @@ export default function GameForm({ players, pastOpponents = [] }: { players: any
     const [date, setDate] = useState(new Date().toISOString().split('T')[0])
     const [teamScore, setTeamScore] = useState('')
     const [opponentScore, setOpponentScore] = useState('')
-    const [season, setSeason] = useState('')
+    const [season, setSeason] = useState('Autumn 2026')
     const [rawPaste, setRawPaste] = useState('')
 
     // Auto calculate result
